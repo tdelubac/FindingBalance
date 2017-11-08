@@ -7,13 +7,13 @@ import time
 
 # Gym global variables
 GAME = 'CartPole-v0'                      # The game we are playing
-MODEL_OUTPUT = 'models/MLP_'+GAME+'.h5'   # Where to save the models
+MODEL_OUTPUT = 'models/MLP_DDQN_'+GAME+'.h5'   # Where to save the models
 MAX_EPISODE_STEPS = 10000                 # Number of steps to consider the game is won (default = 200)
 gym.envs.registry.env_specs['CartPole-v0'].max_episode_steps = MAX_EPISODE_STEPS
 
 # Q-learning global variables
 LEARNING_STEPS          = 50000    # Number of Q-learning steps
-STEPS_TO_UPDATE_NETWORK = 500     # Number of Q-learning steps between each update of the Q_network with weights of the target_Q_network
+STEPS_TO_UPDATE_NETWORK = 500      # Number of Q-learning steps between each update of the Q_network with weights of the target_Q_network
 INITIAL_MEMORY_SIZE     = 1000     # Number of frames to save in memory before beginning Q-learning
 MAX_MEMORY_SIZE         = 10000    # Maximum number of frames in memory (after we start to pop out old memory)
 MINIBATCH_SIZE          = 32       # Size of minibatches on which the Q_network is trained
@@ -44,7 +44,6 @@ def play(game,model,render):
     print("--------------")
     print("Playing a game")
     env = gym.make(game)
-    env.spec.max_episode_steps = MAX_EPISODE_STEPS
     state = env.reset()
 
     done = False
@@ -145,7 +144,7 @@ def main():
             if r_done:
                 target[r_action] = r_reward
             else:
-                target[r_action] = r_reward + GAMMA * np.max(target_Q_network.predict( np.expand_dims(r_new_state,axis=0) )[0])        
+                target[r_action] = r_reward + GAMMA * np.max(Q_network.predict( np.expand_dims(r_new_state,axis=0) )[0])        
             
             # Append lists 
             minibatch.append(r_state)
