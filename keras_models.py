@@ -11,7 +11,6 @@ def MLP(input_shape,label_size):
     model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(Dense(label_size))
-    model.add(Activation('softmax'))
 
     rmsprop = RMSprop(lr=0.00025)
     model.compile(loss='mse',optimizer=rmsprop)

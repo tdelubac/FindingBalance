@@ -9,10 +9,11 @@ import time
 GAME = 'CartPole-v0'                      # The game we are playing
 MODEL_OUTPUT = 'models/MLP_'+GAME+'.h5'   # Where to save the models
 MAX_EPISODE_STEPS = 10000                 # Number of steps to consider the game is won (default = 200)
+gym.envs.registry.env_specs['CartPole-v0'].max_episode_steps = MAX_EPISODE_STEPS
 
 # Q-learning global variables
 LEARNING_STEPS          = 50000    # Number of Q-learning steps
-STEPS_TO_UPDATE_NETWORK = 500      # Number of Q-learning steps between each update of the Q_network with weights of the target_Q_network
+STEPS_TO_UPDATE_NETWORK = 500     # Number of Q-learning steps between each update of the Q_network with weights of the target_Q_network
 INITIAL_MEMORY_SIZE     = 1000     # Number of frames to save in memory before beginning Q-learning
 MAX_MEMORY_SIZE         = 10000    # Maximum number of frames in memory (after we start to pop out old memory)
 MINIBATCH_SIZE          = 32       # Size of minibatches on which the Q_network is trained
@@ -20,11 +21,11 @@ GAMMA                   = 0.99     # Bellman's equation discount parameter
 
 EPSILON_INI             = 1        # Initial value of epsilon (to decide whether to pick an action at random or not)
 EPSILON_MIN             = 0.1      # Minimal value of epsilon
-EPSILON_STEPS           = 20000    # Number of Q-learning steps to go from EPSILON_INI to EPSILON_MIN
+EPSILON_STEPS           = 10000    # Number of Q-learning steps to go from EPSILON_INI to EPSILON_MIN
 
 KERAS_VERBOSE           = False    # Set Keras to verbose mode
 
-RENDER_GAME             = 0.       # Number of steps between each render of a game (set to 0 for no render)
+RENDER_GAME             = 5000     # Number of steps between each render of a game (set to 0 for no render)
 SAVE_STEPS              = 1000     # Number of steps between 2 saves of the model
 
 def epsilon(x):
@@ -40,23 +41,29 @@ def play(game,model,render):
     '''
     Play a gym game
     '''
+    print("--------------")
+    print("Playing a game")
     env = gym.make(game)
     env.spec.max_episode_steps = MAX_EPISODE_STEPS
     state = env.reset()
 
     done = False
+    score = 0
     while not done:
         action = np.argmax(model.predict( np.expand_dims(state,axis=0) )[0])
         state, reward, done, info = env.step(action)
+        score+= reward
         if render:
             env.render()
-
+    print("Scored:", score)
+    print("--------------")
 
 def main():
     time_at_begining = time.time()
     
     # Initialize gym environment
     env = gym.make(GAME)
+    env.spec.max_episode_steps = MAX_EPISODE_STEPS
     state = env.reset()
 
     # Initialize Q_networks
